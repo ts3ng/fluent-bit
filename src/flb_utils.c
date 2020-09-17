@@ -173,6 +173,7 @@ void flb_utils_print_setup(struct flb_config *config)
     struct flb_output_instance *out;
 
     flb_info("Configuration:");
+    flb_info("[ETHOS CUSTOM BUILT]");
 
     /* general */
     flb_info(" flush time     | %f seconds", config->flush);

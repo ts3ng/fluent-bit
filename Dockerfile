@@ -31,8 +31,9 @@ COPY . /tmp/src/
 RUN rm -rf /tmp/src/build/*
 
 WORKDIR /tmp/src/build/
-RUN cmake -DFLB_DEBUG=Off \
+RUN cmake -DFLB_DEBUG=On \
           -DFLB_TRACE=Off \
+          -DFLB_LUAJIT=On \
           -DFLB_JEMALLOC=On \
           -DFLB_TLS=On \
           -DFLB_SHARED_LIB=Off \

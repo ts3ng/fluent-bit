@@ -813,11 +813,16 @@ int flb_tail_file_chunk(struct flb_tail_file *file)
     }
 
     capacity = (file->buf_size - file->buf_len) - 1;
+    flb_plg_trace(ctx->ins, "[ETHOS] capacity %lld", capacity);
     if (capacity < 1) {
         /*
          * If there is no more room for more data, try to increase the
          * buffer under the limit of buffer_max_size.
          */
+
+        flb_plg_trace(ctx->ins, "[ETHOS] file buf_size=%zu buf_max_size=%zu",
+                      file->buf_size, ctx->buf_max_size);
+
         if (file->buf_size >= ctx->buf_max_size) {
             if (ctx->skip_long_lines == FLB_FALSE) {
                 flb_plg_error(ctx->ins, "file=%s requires a larger buffer size, "
