@@ -1,8 +1,15 @@
+ARG inotify_mode=inotify_on
+
 FROM debian:stretch as builder
 COPY --from=amd64/busybox:1.31.0 /bin/busybox /bin/busybox
 RUN chmod 555 /bin/busybox \
  && /bin/busybox --install
 
-FROM fluent/fluent-bit:latest
+FROM ts3ng/fluent-bit:latest AS inotify_on
+
+FROM ts3ng/fluent-bit-inotify-disabled:1.6.8 AS inotify_off
+
+FROM $inotify_mode
+
 COPY --from=builder /bin/ /bin/
 
