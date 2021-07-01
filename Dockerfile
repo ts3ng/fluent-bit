@@ -1,4 +1,5 @@
-FROM debian:buster as builder
+ARG inotify_mode=inotify_on
+FROM debian:stretch as base
 
 # Fluent Bit version
 ENV FLB_MAJOR 1
@@ -31,7 +32,8 @@ RUN mkdir -p /fluent-bit/bin /fluent-bit/etc /fluent-bit/log /tmp/src/
 COPY . /tmp/src/
 RUN rm -rf /tmp/src/build/*
 
-WORKDIR /tmp/src/build/
+WORKDIR /tmp/src/build/ 
+FROM base AS inotify_on
 RUN cmake -DFLB_RELEASE=On \
           -DFLB_TRACE=Off \
           -DFLB_JEMALLOC=On \
@@ -40,8 +42,24 @@ RUN cmake -DFLB_RELEASE=On \
           -DFLB_EXAMPLES=Off \
           -DFLB_HTTP_SERVER=On \
           -DFLB_IN_SYSTEMD=On \
-          -DFLB_OUT_KAFKA=On \
+          -DFLB_OUT_KAFKA=Off \
+          -DFLB_INOTIFY=On \
           -DFLB_OUT_PGSQL=On ../
+
+FROM base AS inotify_off
+RUN cmake -DFLB_DEBUG=Off \
+          -DFLB_TRACE=Off \
+          -DFLB_JEMALLOC=On \
+          -DFLB_BUFFERING=On \
+          -DFLB_TLS=On \
+          -DFLB_SHARED_LIB=Off \
+          -DFLB_EXAMPLES=Off \
+          -DFLB_HTTP_SERVER=On \
+          -DFLB_IN_SYSTEMD=On \
+          -DFLB_OUT_KAFKA=Off \
+          -DFLB_INOTIFY=Off ..
+
+FROM $inotify_mode AS builder
 
 RUN make -j $(getconf _NPROCESSORS_ONLN)
 RUN install bin/fluent-bit /fluent-bit/bin/
